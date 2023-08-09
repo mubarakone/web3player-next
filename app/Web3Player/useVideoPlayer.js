@@ -14,6 +14,7 @@ export default function useVideoPlayer(videoElement) {
           ...playerState,
           isPlaying: !playerState.isPlaying,
         });
+        console.log(watchedTime + " seconds watched")
     };
 
     useEffect(() => {
@@ -94,5 +95,6 @@ export default function useVideoPlayer(videoElement) {
     handleVideoSpeed,
     toggleMute,
     toggleFullscreen,
+    watchedTime,
   }
 }

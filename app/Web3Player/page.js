@@ -46,7 +46,11 @@ export default function Web3Player() {
                 onChange={(e) => handleVideoProgress(e)}
                 className='h-1 w-[350px] rounded-[20px] cursor-pointer h-1.5'
             />
-            <select>
+            <select
+                className='appearance-none text-center text-base not-italic border-none'
+                value={playerState.speed}
+                onChange={(e) => handleVideoSpeed(e)}
+            >
                 <option value="0.50">0.50x</option>
                 <option value="1">1x</option>
                 <option value="1.25">1.25x</option>
