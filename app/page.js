@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Web3Player from './Web3Player/page'
 
 export default function Home() {
