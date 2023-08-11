@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@coinbase/waas-sdk-react-native": "^2.0.2",
+    "@headlessui/react": "^1.7.16",
+    "@heroicons/react": "^2.0.18",
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/react": "^2.7.1",
     "autoprefixer": "10.4.14",
