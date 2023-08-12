@@ -12,7 +12,7 @@ export default function Web3PlayerVideo() {
     const { switchNetwork } = useSwitchNetwork()
     const testnet = () => {
         switchNetwork(11155111)
-    } 
+    }
 
     const StakingContractABI = [
         {
@@ -233,6 +233,7 @@ export default function Web3PlayerVideo() {
 
     const [connectedState, setConnectedState] = useState(false)
     const [isStaked, setStakeCondition] = useState(false)
+    const [isOpen, setOnOpen] = useState(false)
 
     useEffect(() => {
         if (status == "connected") {
@@ -327,13 +328,16 @@ export default function Web3PlayerVideo() {
                 <button onClick={toggleFullscreen} className='inline cursor-pointer border-[none]'>
                     <i className='bg-[none] text-[white] text-xl not-italic'>📺</i>
                 </button>
-            </div>) : (
-                <button onClick={() => write()} className='z-1 fixed bottom-1/2 font-bold text-white'>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-20 h-20">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                    </svg>
-                    Start
-                </button>
+            </div>) : ( 
+                <>
+                    <button onClick={() => setOnOpen(true)} className='z-1 fixed bottom-1/2 font-bold text-white'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-20 h-20">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </svg>
+                        Start
+                    </button>
+                    <Modal clickPlay={isOpen} cancelModal={() => setOnOpen(false)} acceptModal={() => setOnOpen(false)}/>
+                </>
             )}
         </>) : (null)}
             
