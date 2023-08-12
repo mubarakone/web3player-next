@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import useVideoPlayer from './useVideoPlayer'
 import { Web3Button } from '@web3modal/react'
-import { useAccount, useSwitchNetwork, useContractWrite } from 'wagmi'
+import { useAccount, useSwitchNetwork, useContractWrite, useContractRead } from 'wagmi'
 import Modal from './overlays/Modal'
 
 export default function Web3PlayerVideo() {
@@ -219,6 +219,503 @@ export default function Web3PlayerVideo() {
            "type":"function"
         }
      ]
+
+    const NFTContractABI = [
+        {
+           "inputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"constructor"
+        },
+        {
+           "anonymous":false,
+           "inputs":[
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"owner",
+                 "type":"address"
+              },
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"approved",
+                 "type":"address"
+              },
+              {
+                 "indexed":true,
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"Approval",
+           "type":"event"
+        },
+        {
+           "anonymous":false,
+           "inputs":[
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"owner",
+                 "type":"address"
+              },
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"operator",
+                 "type":"address"
+              },
+              {
+                 "indexed":false,
+                 "internalType":"bool",
+                 "name":"approved",
+                 "type":"bool"
+              }
+           ],
+           "name":"ApprovalForAll",
+           "type":"event"
+        },
+        {
+           "anonymous":false,
+           "inputs":[
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"previousOwner",
+                 "type":"address"
+              },
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"newOwner",
+                 "type":"address"
+              }
+           ],
+           "name":"OwnershipTransferred",
+           "type":"event"
+        },
+        {
+           "anonymous":false,
+           "inputs":[
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"from",
+                 "type":"address"
+              },
+              {
+                 "indexed":true,
+                 "internalType":"address",
+                 "name":"to",
+                 "type":"address"
+              },
+              {
+                 "indexed":true,
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"Transfer",
+           "type":"event"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"to",
+                 "type":"address"
+              },
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"approve",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"owner",
+                 "type":"address"
+              }
+           ],
+           "name":"balanceOf",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"getApproved",
+           "outputs":[
+              {
+                 "internalType":"address",
+                 "name":"",
+                 "type":"address"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"_tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"getpriceOfFullVideo",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"owner",
+                 "type":"address"
+              },
+              {
+                 "internalType":"address",
+                 "name":"operator",
+                 "type":"address"
+              }
+           ],
+           "name":"isApprovedForAll",
+           "outputs":[
+              {
+                 "internalType":"bool",
+                 "name":"",
+                 "type":"bool"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"_price",
+                 "type":"uint256"
+              }
+           ],
+           "name":"mintNFT",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"name",
+           "outputs":[
+              {
+                 "internalType":"string",
+                 "name":"",
+                 "type":"string"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"owner",
+           "outputs":[
+              {
+                 "internalType":"address",
+                 "name":"",
+                 "type":"address"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"ownerOf",
+           "outputs":[
+              {
+                 "internalType":"address",
+                 "name":"",
+                 "type":"address"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"price",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"renounceOwnership",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"from",
+                 "type":"address"
+              },
+              {
+                 "internalType":"address",
+                 "name":"to",
+                 "type":"address"
+              },
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"safeTransferFrom",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"from",
+                 "type":"address"
+              },
+              {
+                 "internalType":"address",
+                 "name":"to",
+                 "type":"address"
+              },
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              },
+              {
+                 "internalType":"bytes",
+                 "name":"data",
+                 "type":"bytes"
+              }
+           ],
+           "name":"safeTransferFrom",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"operator",
+                 "type":"address"
+              },
+              {
+                 "internalType":"bool",
+                 "name":"approved",
+                 "type":"bool"
+              }
+           ],
+           "name":"setApprovalForAll",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"bytes4",
+                 "name":"interfaceId",
+                 "type":"bytes4"
+              }
+           ],
+           "name":"supportsInterface",
+           "outputs":[
+              {
+                 "internalType":"bool",
+                 "name":"",
+                 "type":"bool"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"symbol",
+           "outputs":[
+              {
+                 "internalType":"string",
+                 "name":"",
+                 "type":"string"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"tokenId",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"tokenURI",
+           "outputs":[
+              {
+                 "internalType":"string",
+                 "name":"",
+                 "type":"string"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"from",
+                 "type":"address"
+              },
+              {
+                 "internalType":"address",
+                 "name":"to",
+                 "type":"address"
+              },
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"transferFrom",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"address",
+                 "name":"newOwner",
+                 "type":"address"
+              }
+           ],
+           "name":"transferOwnership",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "name":"videoPrices",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        }
+     ]
     
     const {
         playerState,
@@ -251,18 +748,34 @@ export default function Web3PlayerVideo() {
     }
 
     const { write } = useContractWrite({
-        address: '0x0F038A52Fc3205aA3481336de7516DE73838f3C3',
+        address: '0xBf95711394d8CF562298Da32fdcD4e2e45427199',
         abi: StakingContractABI,
         functionName: 'stake',
         chainId: 11155111,
         onSuccess(data) {
             setStakeCondition(true)
             console.log('Success: ', data)
+            setOnOpen(false)
         },
         onError(error) {
             setStakeCondition(false)
             console.log('Contract Error: ', error)
-        }
+            setOnOpen(false)
+        },
+    })
+
+    const readPriceFromContract = useContractRead({
+        address: '0x492ae3a06aa7877c8365941f2FB59360ac57FAa6',
+        abi: NFTContractABI,
+        functionName: 'getpriceOfFullVideo',
+        chainId: 5,
+        args: [1],
+        onSuccess(data) {
+            console.log('readPriceFromContract Success: ', data)
+        },
+        onError(error) {
+            console.log('readPriceFromContract Error: ', error)
+        },
     })
 
   return (
@@ -336,7 +849,12 @@ export default function Web3PlayerVideo() {
                         </svg>
                         Start
                     </button>
-                    <Modal clickPlay={isOpen} cancelModal={() => setOnOpen(false)} acceptModal={() => setOnOpen(false)}/>
+                    <Modal
+                        clickPlay={isOpen} 
+                        cancelModal={() => setOnOpen(false)} 
+                        acceptModal={write}
+                        stakedAmount={JSON.stringify(readPriceFromContract / 1e18)}
+                    />
                 </>
             )}
         </>) : (null)}
