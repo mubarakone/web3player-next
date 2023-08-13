@@ -37,6 +37,8 @@ export default function useVideoPlayer(videoElement) {
         });
     };
 
+    const videoDuration = videoElement.current?.duration;
+
     const handleVideoProgress = (event) => {
         const manualChange = Number(event.target.value);
         videoElement.current.currentTime = (videoElement.current.duration / 100) * manualChange;
@@ -96,5 +98,6 @@ export default function useVideoPlayer(videoElement) {
     toggleMute,
     toggleFullscreen,
     watchedTime,
+    videoDuration,
   }
 }

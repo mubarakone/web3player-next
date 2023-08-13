@@ -44,7 +44,7 @@ export default function Modal(props) {
                       </Dialog.Title>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
-                          Are you sure you want to stake ${props.stakedAmount}. You can unstake however much of the video you didn't watch.
+                          The listed price will be the max amount you will spend on this video. You will receive back however much you didn't watch. Are you sure you want to stake ${props.stakedAmount}.
                         </p>
                       </div>
                     </div>

@@ -11,7 +11,7 @@ export default function Web3PlayerVideo() {
     const { status } = useAccount()
     const { switchNetwork } = useSwitchNetwork()
     const testnet = () => {
-        switchNetwork(11155111)
+        switchNetwork(5)
     }
 
     const StakingContractABI = [
@@ -20,6 +20,11 @@ export default function Web3PlayerVideo() {
               {
                  "internalType":"address",
                  "name":"_nftContractAddress",
+                 "type":"address"
+              },
+              {
+                 "internalType":"address",
+                 "name":"_usdcContractAddress",
                  "type":"address"
               }
            ],
@@ -63,6 +68,40 @@ export default function Web3PlayerVideo() {
            ],
            "name":"PlayerToStake",
            "type":"event"
+        },
+        {
+           "anonymous":false,
+           "inputs":[
+              {
+                 "indexed":false,
+                 "internalType":"address",
+                 "name":"player",
+                 "type":"address"
+              },
+              {
+                 "indexed":false,
+                 "internalType":"uint256",
+                 "name":"priceOutput",
+                 "type":"uint256"
+              }
+           ],
+           "name":"PlayerToUnstate",
+           "type":"event"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"_amount",
+                 "type":"uint256"
+              }
+           ],
+           "name":"approve",
+           "outputs":[
+              
+           ],
+           "stateMutability":"nonpayable",
+           "type":"function"
         },
         {
            "inputs":[
@@ -181,7 +220,7 @@ export default function Web3PlayerVideo() {
                  "type":"bool"
               }
            ],
-           "stateMutability":"payable",
+           "stateMutability":"nonpayable",
            "type":"function"
         },
         {
@@ -215,7 +254,22 @@ export default function Web3PlayerVideo() {
                  "type":"bool"
               }
            ],
-           "stateMutability":"payable",
+           "stateMutability":"nonpayable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"usdcContract",
+           "outputs":[
+              {
+                 "internalType":"contract IERC20",
+                 "name":"",
+                 "type":"address"
+              }
+           ],
+           "stateMutability":"view",
            "type":"function"
         }
      ]
@@ -726,6 +780,8 @@ export default function Web3PlayerVideo() {
         handleVideoSpeed,
         toggleMute,
         toggleFullscreen,
+        watchedTime,
+        videoDuration,
     } = useVideoPlayer(videoElement)
 
     const [connectedState, setConnectedState] = useState(false)
@@ -743,31 +799,10 @@ export default function Web3PlayerVideo() {
         }
     }, [status])
 
-    const toggleStop = () => {
-        setConnectedState(false);
-    }
-
-    const { write } = useContractWrite({
-        address: '0xBf95711394d8CF562298Da32fdcD4e2e45427199',
-        abi: StakingContractABI,
-        functionName: 'stake',
-        chainId: 11155111,
-        onSuccess(data) {
-            setStakeCondition(true)
-            console.log('Success: ', data)
-            setOnOpen(false)
-        },
-        onError(error) {
-            setStakeCondition(false)
-            console.log('Contract Error: ', error)
-            setOnOpen(false)
-        },
-    })
-
     const readPriceFromContract = useContractRead({
-        address: '0x492ae3a06aa7877c8365941f2FB59360ac57FAa6',
+        address: '0x1AB2a434F093C669424354e884E92Ea10690C6a4',
         abi: NFTContractABI,
-        functionName: 'getpriceOfFullVideo',
+        functionName: "getpriceOfFullVideo",
         chainId: 5,
         args: [1],
         onSuccess(data) {
@@ -777,6 +812,39 @@ export default function Web3PlayerVideo() {
             console.log('readPriceFromContract Error: ', error)
         },
     })
+
+    const priceOfFullVideo = readPriceFromContract.data.toString()
+
+    const { write } = useContractWrite({
+        address: '0x9E4fAF439C081884F7a057e987177E1fBAA7EdC6',
+        abi: StakingContractABI,
+        functionName: 'stake',
+        chainId: 5,
+        args: [1],
+        onSuccess(data) {
+            setStakeCondition(true)
+            console.log('ContractWrite Success: ', data)
+            setOnOpen(false)
+        },
+        onError(error) {
+            setStakeCondition(false)
+            console.log('ContractWrite Error: ', error)
+            setOnOpen(false)
+        },
+    })
+
+    const toggleStop = () => {
+    //    setStakeCondition(false);
+        console.log('Watched Time is ', watchedTime)
+        console.log('Video Duration is ', videoDuration)
+        console.log('priceOfFullVideo is ', priceOfFullVideo)
+        const pricePerSecond = priceOfFullVideo/videoDuration
+        const priceOfAmountVideoWatched = watchedTime * pricePerSecond
+        const finalPriceOfAmountVideoWatched = priceOfAmountVideoWatched.toFixed(2)
+        console.log('pricePerSecond is ', pricePerSecond)
+        console.log('priceOfAmountVideoWatched is ', priceOfAmountVideoWatched)
+        console.log('finalPriceOfAmountVideoWatched is ', finalPriceOfAmountVideoWatched)
+    }
 
   return (
     <div className='group w-full max-w-[700px] relative flex justify-center overflow-hidden rounded-[10px]'>
@@ -800,9 +868,17 @@ export default function Web3PlayerVideo() {
                 <div name="actions">
                     <button onClick={togglePlay} className='cursor-pointer border-[none]'>
                         {!playerState.isPlaying ? (
-                            <i className='bg-[none] text-[white] text-3xl not-italic'>▶️</i>
+                            <i className='bg-[none] text-[white] text-3xl not-italic'>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                                </svg>
+                            </i>
                         ) : (
-                            <i className='bg-[none] text-[white] text-3xl not-italic'>⏸</i>
+                            <i className='bg-[none] text-[white] text-3xl not-italic'>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                                </svg>
+                            </i>
                         )}
                     </button>
                 </div>
@@ -815,7 +891,12 @@ export default function Web3PlayerVideo() {
                     className='h-1 w-[350px] rounded-[20px] cursor-pointer h-1.5'
                 />
                 <button onClick={toggleStop} className='cursor-pointer border-[none]'>
-                    <i className='bg-[none] text-[white] text-3xl not-italic'>⏹️</i>
+                    <i className='bg-[none] text-[white] text-3xl not-italic'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 9.563C9 9.252 9.252 9 9.563 9h4.874c.311 0 .563.252.563.563v4.874c0 .311-.252.563-.563.563H9.564A.562.562 0 019 14.437V9.564z" />
+                        </svg>
+                    </i>
                 </button>
                 <select
                     className='appearance-none text-center text-base not-italic border-none'
@@ -833,27 +914,40 @@ export default function Web3PlayerVideo() {
                 }
                 <button onClick={toggleMute} className='cursor-pointer border-[none]'>
                     {!playerState.isMuted ? (
-                        <i className='bg-[none] text-[white] text-xl not-italic'>🔊</i>
+                        <i className='bg-[none] text-[white] text-xl not-italic'>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                            </svg>
+                        </i>
                     ) : (
-                        <i className='bg-[none] text-[white] text-xl not-italic'>🔇</i>
+                        <i className='bg-[none] text-[white] text-xl not-italic'>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.94a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.757 3.63 8.25 4.51 8.25H6.75z" />
+                            </svg>
+                        </i>
                     )}
                 </button>
                 <button onClick={toggleFullscreen} className='inline cursor-pointer border-[none]'>
-                    <i className='bg-[none] text-[white] text-xl not-italic'>📺</i>
+                    <i className='bg-[none] text-[white] text-xl not-italic'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z" />
+                        </svg>
+                    </i>
                 </button>
             </div>) : ( 
                 <>
                     <button onClick={() => setOnOpen(true)} className='z-1 fixed bottom-1/2 font-bold text-white'>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-20 h-20">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
                         </svg>
                         Start
                     </button>
                     <Modal
                         clickPlay={isOpen} 
                         cancelModal={() => setOnOpen(false)} 
-                        acceptModal={write}
-                        stakedAmount={JSON.stringify(readPriceFromContract / 1e18)}
+                        acceptModal={() => setStakeCondition(true)}
+                        stakedAmount={priceOfFullVideo}
                     />
                 </>
             )}
