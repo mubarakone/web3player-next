@@ -895,7 +895,7 @@ export default function Web3PlayerVideo() {
                     onChange={(e) => handleVideoProgress(e)}
                     className='h-1 w-[350px] rounded-[20px] cursor-pointer h-1.5'
                 />
-                <button onClick={withdraw} className='cursor-pointer border-[none]'>
+                <button onClick={() => setStakeCondition(false)} className='cursor-pointer border-[none]'>
                     <i className='bg-[none] text-[white] text-3xl not-italic'>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -951,7 +951,7 @@ export default function Web3PlayerVideo() {
                     <Deposit
                         clickPlay={isOpen} 
                         cancelModal={() => setOnOpen(false)} 
-                        acceptModal={deposit}
+                        acceptModal={() => setStakeCondition(true)}
                         stakedAmount={priceOfFullVideo * 10}
                     />
                 </>

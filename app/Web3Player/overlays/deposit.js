@@ -295,7 +295,7 @@ export default function Deposit(props) {
     <Modal
         clickPlay={props.clickPlay} 
         cancelModal={props.cancelModal} 
-        acceptModal={write}
+        acceptModal={props.acceptModal}
         stakedAmount={props.stakedAmount}
      />
   )
