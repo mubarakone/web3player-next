@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import useVideoPlayer from './useVideoPlayer'
 import { Web3Button } from '@web3modal/react'
 import { useAccount, useSwitchNetwork, useContractWrite, useContractRead } from 'wagmi'
-import Modal from './overlays/Modal'
+import Deposit from './overlays/deposit'
 
 export default function Web3PlayerVideo() {
     const video = "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4"
@@ -21,14 +21,9 @@ export default function Web3PlayerVideo() {
                  "internalType":"address",
                  "name":"_nftContractAddress",
                  "type":"address"
-              },
-              {
-                 "internalType":"address",
-                 "name":"_usdcContractAddress",
-                 "type":"address"
               }
            ],
-           "stateMutability":"nonpayable",
+           "stateMutability":"payable",
            "type":"constructor"
         },
         {
@@ -70,37 +65,18 @@ export default function Web3PlayerVideo() {
            "type":"event"
         },
         {
-           "anonymous":false,
            "inputs":[
-              {
-                 "indexed":false,
-                 "internalType":"address",
-                 "name":"player",
-                 "type":"address"
-              },
-              {
-                 "indexed":false,
-                 "internalType":"uint256",
-                 "name":"priceOutput",
-                 "type":"uint256"
-              }
-           ],
-           "name":"PlayerToUnstate",
-           "type":"event"
-        },
-        {
-           "inputs":[
-              {
-                 "internalType":"uint256",
-                 "name":"_amount",
-                 "type":"uint256"
-              }
-           ],
-           "name":"approve",
-           "outputs":[
               
            ],
-           "stateMutability":"nonpayable",
+           "name":"Owner",
+           "outputs":[
+              {
+                 "internalType":"address payable",
+                 "name":"",
+                 "type":"address"
+              }
+           ],
+           "stateMutability":"view",
            "type":"function"
         },
         {
@@ -124,9 +100,73 @@ export default function Web3PlayerVideo() {
         },
         {
            "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"deposit",
+           "outputs":[
+              
+           ],
+           "stateMutability":"payable",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"fetchMsgValue",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
               
            ],
            "name":"getBalance",
+           "outputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"",
+                 "type":"uint256"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
+           ],
+           "name":"isMsgValueGreater",
+           "outputs":[
+              {
+                 "internalType":"bool",
+                 "name":"",
+                 "type":"bool"
+              }
+           ],
+           "stateMutability":"view",
+           "type":"function"
+        },
+        {
+           "inputs":[
+              
+           ],
+           "name":"msgValue",
            "outputs":[
               {
                  "internalType":"uint256",
@@ -180,9 +220,13 @@ export default function Web3PlayerVideo() {
         },
         {
            "inputs":[
-              
+              {
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
+              }
            ],
-           "name":"priceOfFullVideo",
+           "name":"priceOfVideo",
            "outputs":[
               {
                  "internalType":"uint256",
@@ -200,25 +244,6 @@ export default function Web3PlayerVideo() {
            "name":"renounceOwnership",
            "outputs":[
               
-           ],
-           "stateMutability":"nonpayable",
-           "type":"function"
-        },
-        {
-           "inputs":[
-              {
-                 "internalType":"uint256",
-                 "name":"tokenId",
-                 "type":"uint256"
-              }
-           ],
-           "name":"stake",
-           "outputs":[
-              {
-                 "internalType":"bool",
-                 "name":"stakeSate",
-                 "type":"bool"
-              }
            ],
            "stateMutability":"nonpayable",
            "type":"function"
@@ -244,32 +269,18 @@ export default function Web3PlayerVideo() {
                  "internalType":"uint256",
                  "name":"priceOfAmountVideoWatched",
                  "type":"uint256"
-              }
-           ],
-           "name":"unstake",
-           "outputs":[
+              },
               {
-                 "internalType":"bool",
-                 "name":"unstakeState",
-                 "type":"bool"
+                 "internalType":"uint256",
+                 "name":"tokenId",
+                 "type":"uint256"
               }
            ],
-           "stateMutability":"nonpayable",
-           "type":"function"
-        },
-        {
-           "inputs":[
+           "name":"withdraw",
+           "outputs":[
               
            ],
-           "name":"usdcContract",
-           "outputs":[
-              {
-                 "internalType":"contract IERC20",
-                 "name":"",
-                 "type":"address"
-              }
-           ],
-           "stateMutability":"view",
+           "stateMutability":"payable",
            "type":"function"
         }
      ]
@@ -813,38 +824,32 @@ export default function Web3PlayerVideo() {
         },
     })
 
-    const priceOfFullVideo = readPriceFromContract.data.toString()
-
-    const { write } = useContractWrite({
-        address: '0x9E4fAF439C081884F7a057e987177E1fBAA7EdC6',
-        abi: StakingContractABI,
-        functionName: 'stake',
-        chainId: 5,
-        args: [1],
-        onSuccess(data) {
-            setStakeCondition(true)
-            console.log('ContractWrite Success: ', data)
-            setOnOpen(false)
-        },
-        onError(error) {
-            setStakeCondition(false)
-            console.log('ContractWrite Error: ', error)
-            setOnOpen(false)
-        },
-    })
-
-    const toggleStop = () => {
-    //    setStakeCondition(false);
-        console.log('Watched Time is ', watchedTime)
-        console.log('Video Duration is ', videoDuration)
-        console.log('priceOfFullVideo is ', priceOfFullVideo)
-        const pricePerSecond = priceOfFullVideo/videoDuration
-        const priceOfAmountVideoWatched = watchedTime * pricePerSecond
-        const finalPriceOfAmountVideoWatched = priceOfAmountVideoWatched.toFixed(2)
-        console.log('pricePerSecond is ', pricePerSecond)
-        console.log('priceOfAmountVideoWatched is ', priceOfAmountVideoWatched)
-        console.log('finalPriceOfAmountVideoWatched is ', finalPriceOfAmountVideoWatched)
+    const priceOfFullVideo = () => {
+        const convert = readPriceFromContract.data
+        return convert?.toString;
     }
+
+    const pricePerSecond = priceOfFullVideo/videoDuration
+    const priceOfAmountVideoWatched = watchedTime * pricePerSecond
+    const finalPriceOfAmountVideoWatched = priceOfAmountVideoWatched.toFixed(2)
+
+        const { write } = useContractWrite({
+            address: '0xB4e0156F3621dC80e72E78D0388aBce8aa2187c1',
+            abi: StakingContractABI,
+            functionName: 'withdraw',
+            chainId: 5,
+            args: [finalPriceOfAmountVideoWatched * 100, 1],
+            onSuccess(data) {
+                setStakeCondition(false)
+                console.log('ContractWrite Success: ', data)
+                setOnOpen(false)
+            },
+            onError(error) {
+                setStakeCondition(true)
+                console.log('ContractWrite Error: ', error)
+                setOnOpen(false)
+            },
+        })
 
   return (
     <div className='group w-full max-w-[700px] relative flex justify-center overflow-hidden rounded-[10px]'>
@@ -890,7 +895,7 @@ export default function Web3PlayerVideo() {
                     onChange={(e) => handleVideoProgress(e)}
                     className='h-1 w-[350px] rounded-[20px] cursor-pointer h-1.5'
                 />
-                <button onClick={toggleStop} className='cursor-pointer border-[none]'>
+                <button onClick={withdraw} className='cursor-pointer border-[none]'>
                     <i className='bg-[none] text-[white] text-3xl not-italic'>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -943,11 +948,11 @@ export default function Web3PlayerVideo() {
                         </svg>
                         Start
                     </button>
-                    <Modal
+                    <Deposit
                         clickPlay={isOpen} 
                         cancelModal={() => setOnOpen(false)} 
-                        acceptModal={() => setStakeCondition(true)}
-                        stakedAmount={priceOfFullVideo}
+                        acceptModal={deposit}
+                        stakedAmount={priceOfFullVideo * 10}
                     />
                 </>
             )}
